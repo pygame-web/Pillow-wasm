@@ -599,9 +599,19 @@ class pil_build_ext(build_ext):
             _add_directory(include_dirs, "/opt/local/include")
 
         # FIXME: check /opt/stuff directories here?
+        cc = __import__("sysconfig").get_config_var("HOST_GNU_TYPE")
+        if cc.startswith('wasm'):
+            print(f" =============== {sys.platform=} {cc=} {os.environ['EMSDK']=} =================")
+            emsdk = os.environ['EMSDK']
+            sysroot = f"{emsdk}/upstream/emscripten/cache/sysroot"
+            _add_directory(library_dirs, f"{sysroot}/lib/wasm32-emscripten/pic")
+            _add_directory(include_dirs, f"{sysroot}/include")
+
+            _add_directory(library_dirs, "/opt/python-wasm-sdk/devices/emsdk/usr/lib" )
+            _add_directory(include_dirs, "/opt/python-wasm-sdk/devices/emsdk/usr/include" )
 
         # standard locations
-        if not self.disable_platform_guessing:
+        elif not self.disable_platform_guessing:
             _add_directory(library_dirs, "/usr/local/lib")
             _add_directory(include_dirs, "/usr/local/include")
 
